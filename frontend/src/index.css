@@ -1,0 +1,114 @@
+.task-list {
+  padding-top: 10px;
+  padding-bottom: 10px;
+}
+
+.task {
+  background: white;
+  padding: 15px;
+  margin-bottom: 10px;
+  border-radius: 6px;
+  border: 2px solid transparent;
+  transition: all 0.2s ease-in-out;
+  cursor: grab;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
+}
+
+.task:hover {
+  border-color: #007bff;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.25);
+  transform: translateY(-2px);
+}
+
+.task.selected {
+  border-color: #007bff;
+}
+
+.task.completed {
+  border-color: green !important;
+  background-color: #f9fff9;
+}
+
+.task.all-day {
+  background: #f9f0ff;
+  border-color: purple;
+}
+
+.task-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.task-actions {
+  margin-top: 10px;
+}
+
+.time-entry {
+  margin-top: 10px;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.time-display {
+  margin-top: 4px;
+  font-style: italic;
+}
+
+.btn {
+  padding: 6px 12px;
+  border-radius: 4px;
+  color: white;
+  border: none;
+  cursor: pointer;
+}
+
+.btn.delete {
+  background-color: red;
+  margin-right: 8px;
+}
+
+.btn.complete {
+  background-color: green;
+}
+
+.btn.incomplete {
+  background-color: #444;
+}
+
+.btn.enter {
+  background-color: #007bff;
+}
+
+.btn.all-day {
+  background-color: purple;
+}
+
+.clock-icon {
+  font-size: 18px;
+  color: #555;
+  margin-left: 10px;
+  cursor: pointer;
+  transition: color 0.3s ease;
+}
+
+.clock-icon:hover {
+  color: #007bff;
+}
+
+  .scrolling-text {
+  width: 100%;
+  overflow: hidden;
+  white-space: nowrap;
+  box-sizing: border-box;
+  animation: scroll 10s linear infinite;
+  text-align: center;
+  font-weight: 500;
+  font-size: 1.2rem;
+}
+
+@keyframes scroll {
+  0%   { transform: translateX(100%); }
+  100% { transform: translateX(-100%); }
+}

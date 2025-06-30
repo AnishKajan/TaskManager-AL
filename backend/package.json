@@ -1,0 +1,58 @@
+{
+  "name": "backend",
+  "version": "1.0.0",
+  "main": "insertUser.js",
+  "scripts": {
+    "test": "cross-env NODE_ENV=test MONGO_DB_NAME=taskmanager_test mocha --require test/setup.js test/**/*.test.js --timeout 20000 --exit",
+    "test:watch": "cross-env NODE_ENV=test MONGO_DB_NAME=taskmanager_test mocha --require test/setup.js test/**/*.test.js --watch --timeout 20000",
+    "test:coverage": "cross-env NODE_ENV=test MONGO_DB_NAME=taskmanager_test nyc mocha --require test/setup.js test/**/*.test.js --timeout 20000 --exit",
+    "start": "node server.js",
+    "dev": "nodemon server.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "bcrypt": "^6.0.0",
+    "cors": "^2.8.5",
+    "dotenv": "^16.5.0",
+    "express": "^5.1.0",
+    "jsonwebtoken": "^9.0.2",
+    "mongodb": "^6.16.0",
+    "nodemon": "^3.1.10",
+    "socket.io": "^4.8.1"
+  },
+  "description": "",
+  "devDependencies": {
+    "chai": "^4.5.0",
+    "chai-http": "^5.1.2",
+    "cross-env": "^7.0.3",
+    "mocha": "^11.6.0",
+    "nyc": "^17.1.0",
+    "supertest": "^7.1.1"
+  },
+  "nyc": {
+    "include": [
+      "routes/**/*.js",
+      "models/**/*.js",
+      "middleware/**/*.js",
+      "utils/**/*.js",
+      "*.js"
+    ],
+    "exclude": [
+      "test/**/*.js",
+      "node_modules/**",
+      "insertUser.js"
+    ],
+    "reporter": [
+      "text",
+      "html",
+      "lcov"
+    ],
+    "check-coverage": true,
+    "lines": 70,
+    "functions": 70,
+    "branches": 70,
+    "statements": 70
+  }
+}

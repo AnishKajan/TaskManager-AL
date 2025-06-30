@@ -1,0 +1,72 @@
+/* src/components/LoginPage.css */
+.login-container {
+  background: #f4f4f4;
+  height: 100vh;
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+.page-title {
+  color: #007aff;
+  font-weight: bold;
+  margin-bottom: 20px;
+}
+
+.login-box {
+  background: white;
+  border: 2px solid #007aff;
+  max-width: 600px;
+  margin: 50px auto;
+  padding: 40px;
+  text-align: center;
+  border-radius: 4px;
+}
+
+.login-box h1 {
+  font-size: 36px;
+  font-weight: 800;
+  margin-bottom: 30px;
+}
+
+.login-box input {
+  display: block;
+  width: 70%;
+  margin: 10px auto;
+  padding: 10px;
+  font-size: 16px;
+  background: #e6e6e6;
+  border: none;
+}
+
+.button-group {
+  margin-top: 10px;
+}
+
+.btn-light {
+  background: #e0e0e0;
+  padding: 6px 12px;
+  margin: 0 5px;
+  border: 1px solid #999;
+  cursor: pointer;
+}
+
+.labels {
+  margin-top: 40px;
+  font-size: 16px;
+}
+
+.work {
+  color: purple;
+}
+
+.school {
+  color: #007aff;
+}
+
+.personal {
+  color: orange;
+}
+
+.dot {
+  margin: 0 10px;
+}
