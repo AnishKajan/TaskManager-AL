@@ -9,8 +9,8 @@ WORKDIR /app
 # Copy only dependency declarations to leverage caching
 COPY package*.json ./
 
-# Install dependencies
-RUN npm install --omit=dev
+# Install dependencies with legacy peer deps to resolve OpenAI conflicts
+RUN npm install --omit=dev --legacy-peer-deps
 
 # Copy the full app source into the container
 COPY . .

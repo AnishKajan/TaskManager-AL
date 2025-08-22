@@ -34,6 +34,8 @@ app.use('/api/auth', require('./routes/auth'));
 app.use('/api/tasks', require('./routes/tasks'));
 app.use('/api/users', require('./routes/users'));
 app.use('/api/notifications', require('./routes/notifications'));
+// ADD: Chatbot route registration (ONLY CHANGE TO EXISTING FILE)
+app.use('/api/chatbot', require('./routes/chatbot'));
 
 // Enhanced WebSocket connection handling with better logging
 io.on('connection', (socket) => {
@@ -114,4 +116,5 @@ server.listen(PORT, '0.0.0.0', () => {
   console.log(`✅ Server running on port ${PORT} at ${new Date().toLocaleString()}`);
   console.log('🔔 Notification service initialized');
   console.log('🔌 WebSocket server ready for connections');
+  console.log('🤖 Chatbot service ready'); // ADD: Chatbot ready message
 });

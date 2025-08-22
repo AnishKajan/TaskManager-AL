@@ -8,6 +8,8 @@ import { useNavigate } from 'react-router-dom';
 import io from 'socket.io-client';
 import { Task } from '../types/task';
 import SettingsModal from '../components/SettingsModal';
+import ChatBot from '../components/ChatBot'; // Updated import
+import { useGlobalUI } from '../App'; // Import global state
 
 const API = 'http://localhost:5050/api';
 
@@ -27,10 +29,16 @@ const getPriorityColor = (priority: string) => {
 };
 
 const Archive: React.FC = () => {
+  const navigate = useNavigate();
+  
+  // Use global state for chatbot
+  const { setSelectedTab, showChatBot, setShowChatBot } = useGlobalUI();
+  
   const [tasks, setTasks] = useState<Task[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedDate] = useState(new Date());
   const [showSettings, setShowSettings] = useState(false);
+  const [refreshTrigger, setRefreshTrigger] = useState(0); // Add refresh trigger
   const [snackbar, setSnackbar] = useState({
     open: false,
     message: '',
@@ -44,7 +52,31 @@ const Archive: React.FC = () => {
   const [socket, setSocket] = useState<any>(null);
   const token = localStorage.getItem('token');
   const userEmail = localStorage.getItem('email');
-  const navigate = useNavigate();
+
+  // Listen for chatbot task actions to refresh data
+  useEffect(() => {
+    const handleChatbotAction = (event: any) => {
+      console.log('🤖 Archive: Chatbot action detected:', event.detail);
+      // Refresh tasks when chatbot performs actions
+      fetchTasks();
+      
+      // Force component re-render
+      setRefreshTrigger(prev => prev + 1);
+      
+      // Show success message
+      setSnackbar({
+        open: true,
+        message: `Task ${event.detail.action.replace('task_', '')} successfully via chatbot`,
+        severity: 'success'
+      });
+    };
+
+    window.addEventListener('chatbotTaskAction', handleChatbotAction);
+    
+    return () => {
+      window.removeEventListener('chatbotTaskAction', handleChatbotAction);
+    };
+  }, []);
 
   // WebSocket connection and notification handling
   useEffect(() => {
@@ -127,7 +159,7 @@ const Archive: React.FC = () => {
         // Request notification permission on component mount
         if ('Notification' in window && Notification.permission === 'default') {
           Notification.requestPermission().then((permission) => {
-            console.log(' Archive: Browser notification permission:', permission);
+            console.log('🔔 Archive: Browser notification permission:', permission);
           });
         }
 
@@ -157,6 +189,31 @@ const Archive: React.FC = () => {
       
       console.log('Archive tasks:', res.data);
       setTasks(res.data || []);
+
+      // 🔁 Tell the chatbot what list we just showed (ARCHIVE list)
+      try {
+        const archived = (res.data || []);
+        window.dispatchEvent(
+          new CustomEvent('updateNlpContext', {
+            detail: {
+              source: 'archive',
+              tasks: archived.map((t: Task, i: number) => ({
+                _id: t._id,
+                title: t.title,
+                date: t.date,
+                startTime: t.startTime,
+                endTime: t.endTime,
+                priority: t.priority,
+                recurring: t.recurring,
+                collaborators: t.collaborators,
+                index: i + 1,
+                source: 'archive',
+                isArchived: true
+              }))
+            }
+          })
+        );
+      } catch {}
     } catch (err) {
       console.error('Error fetching archive tasks:', err);
       setSnackbar({
@@ -195,7 +252,7 @@ const Archive: React.FC = () => {
       try {
         const userEmail = localStorage.getItem('email');
         if (userEmail && token) {
-          console.log(' Archive: Checking for immediate notification after restore...');
+          console.log('🔔 Archive: Checking for immediate notification after restore...');
           
           // Make API call to check immediate notification for the restored task
           const notifResponse = await fetch(`${API}/notifications/test/${taskId}`, {
@@ -265,10 +322,14 @@ const Archive: React.FC = () => {
     }
   };
 
-  // FIXED NAVIGATION HANDLERS
+  // FIXED NAVIGATION HANDLERS - Now correctly maps to tab indices and updates global state
   const handleTabNavigation = (tabIndex: number) => {
-    // Navigate to dashboard with specific tab
-    navigate('/dashboard', { state: { selectedTab: tabIndex } });
+    console.log('🎯 Archive: Navigating to tab:', tabIndex);
+    // Update global state first
+    setSelectedTab(tabIndex);
+    // Navigate to dashboard with specific tab in URL
+    const tabParam = tabIndex === 0 ? '' : `?tab=${tabIndex}`;
+    navigate(`/dashboard${tabParam}`);
   };
 
   // CHANGED: Open settings modal locally instead of navigating
@@ -303,7 +364,7 @@ const Archive: React.FC = () => {
               fontSize="1.5rem"
               fontWeight={400}
               sx={{ cursor: 'pointer' }}
-              onClick={() => handleTabNavigation(index)}
+              onClick={() => handleTabNavigation(index)} // This now correctly maps: Work=0, School=1, Personal=2
             >
               {tab}
             </Typography>
@@ -317,6 +378,23 @@ const Archive: React.FC = () => {
               Archive
             </Typography>
           </Box>
+
+          {/* Task Assistant Button - Using Global State */}
+          <Button 
+            onClick={() => setShowChatBot(!showChatBot)} 
+            sx={{ 
+              color: 'white', 
+              fontWeight: 600, 
+              textTransform: 'uppercase', 
+              fontSize: '1rem',
+              backgroundColor: showChatBot ? 'rgba(255, 255, 255, 0.2)' : 'transparent',
+              '&:hover': {
+                backgroundColor: 'rgba(255, 255, 255, 0.1)'
+              }
+            }}
+          >
+            🤖 Task Assistant
+          </Button>
 
           {/* Settings icon - CHANGED: Use local handler */}
           <IconButton onClick={handleSettingsClick}>
@@ -374,7 +452,7 @@ const Archive: React.FC = () => {
 
                 return (
                   <Box
-                    key={task._id}
+                    key={`${task._id}-${refreshTrigger}`} // Force re-render with refresh trigger
                     display="flex"
                     alignItems="center"
                     bgcolor="#f2ecf4"
@@ -479,6 +557,9 @@ const Archive: React.FC = () => {
 
       {/* Settings Modal */}
       <SettingsModal open={showSettings} onClose={() => setShowSettings(false)} />
+
+      {/* Global ChatBot Component */}
+      <ChatBot onTaskUpdate={fetchTasks} />
 
       {/* Regular Snackbar for notifications (bottom-left) */}
       <Snackbar

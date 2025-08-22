@@ -7,6 +7,7 @@ export type UserType = {
 export type Time = {
   hour: string;
   minute: string;
+  period: string;
   ampm: string;
 };
 
